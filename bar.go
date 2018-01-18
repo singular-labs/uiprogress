@@ -140,6 +140,14 @@ func (b *Bar) AppendCompleted() *Bar {
 	return b
 }
 
+// AppendRate appends the completion rate to the progress bar
+func (b *Bar) AppendRate() *Bar {
+	b.AppendFunc(func(b *Bar) string {
+		return b.CompletionRateString()
+	})
+	return b
+}
+
 // AppendElapsed appends the time elapsed the be progress bar
 func (b *Bar) AppendElapsed() *Bar {
 	b.AppendFunc(func(b *Bar) string {
@@ -219,9 +227,20 @@ func (b *Bar) CompletedPercent() float64 {
 	return (float64(b.Current()) / float64(b.Total)) * 100.00
 }
 
+// CompletionRate return the rate of completion up until now
+func (b *Bar) CompletionRate() float64 {
+	return (float64(b.Current()) / float64(b.SecondsElapsed()))
+	//return  float64(b.Current())
+}
+
 // CompletedPercentString returns the formatted string representation of the completed percent
 func (b *Bar) CompletedPercentString() string {
 	return fmt.Sprintf("%3.f%%", b.CompletedPercent())
+}
+
+// CompletionRateString returns the formatted string representation of the completion rate
+func (b *Bar) CompletionRateString() string {
+	return fmt.Sprintf("  %3.f e/s", b.CompletionRate())
 }
 
 // TimeElapsed returns the time elapsed
@@ -229,6 +248,11 @@ func (b *Bar) TimeElapsed() time.Duration {
 	b.mtx.RLock()
 	defer b.mtx.RUnlock()
 	return b.timeElapsed
+}
+
+// TimeElapsed returns the time elapsed
+func (b *Bar) SecondsElapsed() time.Duration {
+	return b.TimeElapsed()/1000000000
 }
 
 // TimeElapsedString returns the formatted string represenation of the time elapsed
